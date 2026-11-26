@@ -29,6 +29,7 @@
     <main id="main">
       <!-- ================= HOY ================= -->
       <section id="panel-hoy" class="panel" role="tabpanel" aria-labelledby="tab-hoy">
+        <div id="nav-hoy" class="wk-nav"></div>
         <div id="day-chips" class="day-chips" role="group" aria-label="Día de la semana"></div>
         <div class="hoy-grid">
           <div id="meals" class="meals" aria-label="Tomas del día"></div>
@@ -39,20 +40,33 @@
 
       <!-- ================= SEMANA ================= -->
       <section id="panel-semana" class="panel" role="tabpanel" aria-labelledby="tab-semana" hidden>
+        <div id="nav-semana" class="wk-nav"></div>
+        <div class="week-actions">
+          <button type="button" class="btn primary" data-act="gen-week" data-key="gen-week">Generar menú nuevo</button>
+          <button type="button" class="btn secondary" data-act="open-gen" data-key="open-gen">Ajustes del generador</button>
+          <button type="button" class="btn secondary" data-act="open-excl" data-key="open-excl-w">Alimentos que no quiero</button>
+          <button type="button" class="btn secondary" data-act="open-fridge" data-key="open-fridge-w">¿Qué tengo en la nevera?</button>
+        </div>
+        <p id="week-note" class="hint week-note"></p>
         <p id="week-avg" class="hint week-avg"></p>
         <div id="week-grid" class="week-grid"></div>
+        <details id="week-history" class="card home-box"></details>
       </section>
 
       <!-- ================= COMPRA ================= -->
       <section id="panel-compra" class="panel" role="tabpanel" aria-labelledby="tab-compra" hidden>
         <article class="card shop-head" id="shop-head"></article>
         <div id="shop-list" class="shop-list"></div>
+        <article class="card" id="shop-add"></article>
         <details id="shop-home" class="card home-box"></details>
+        <p id="shop-note" class="hint shop-note"></p>
       </section>
 
       <!-- ================= RECETAS ================= -->
       <section id="panel-recetas" class="panel" role="tabpanel" aria-labelledby="tab-recetas" hidden>
         <div id="recipe-filter" class="segmented" role="group" aria-label="Filtrar recetas por toma"></div>
+        <div id="recipe-extra" class="segmented" role="group" aria-label="Más filtros"></div>
+        <label class="field search-field"><span class="sr-only">Buscar receta</span><input id="recipe-search" type="text" inputmode="search" autocomplete="off" placeholder="Buscar receta o ingrediente"></label>
         <div id="recipe-list" class="recipe-list"></div>
       </section>
 
@@ -60,6 +74,9 @@
       <section id="panel-mas" class="panel" role="tabpanel" aria-labelledby="tab-mas" hidden>
         <div class="more-grid">
           <article class="card" id="goals-card"></article>
+          <article class="card" id="excl-card"></article>
+          <article class="card" id="gen-card"></article>
+          <article class="card" id="ratings-card"></article>
           <article class="card">
             <h2>Copia de seguridad</h2>
             <p class="hint">Tus datos solo están en este dispositivo. Guarda una copia de vez en cuando.</p>
@@ -68,12 +85,18 @@
               <button type="button" class="btn secondary" id="btn-import">Importar copia</button>
             </div>
             <input type="file" id="file-import" accept=".json,application/json" hidden>
-            <button type="button" class="btn secondary spaced" id="btn-reset-plan">Restaurar todo el menú original</button>
+            <button type="button" class="btn secondary spaced" id="btn-reset-plan">Restaurar el menú original de esta semana</button>
           </article>
           <article class="card">
             <h2>Enlaces</h2>
             <a class="link-row" href="https://prodesin.github.io/mi-entrenador/" target="_blank" rel="noopener">
               <span><b>Entrenador personal</b><small>La app hermana: fuerza, caminata, comida y peso</small></span><i aria-hidden="true">›</i>
+            </a>
+            <a class="link-row" href="https://prodesin.github.io/mi-plato/" target="_blank" rel="noopener">
+              <span><b>Mi plato</b><small>Apunta lo que comes y recibe consejos sencillos</small></span><i aria-hidden="true">›</i>
+            </a>
+            <a class="link-row" href="https://prodesin.github.io/mi-salud/" target="_blank" rel="noopener">
+              <span><b>Mi salud</b><small>Tensión, peso, glucosa, ejercicio y medicación en una pantalla</small></span><i aria-hidden="true">›</i>
             </a>
             <a class="link-row" href="https://prodesin.github.io/mi-tension/" target="_blank" rel="noopener">
               <span><b>Mi tensión</b><small>La app hermana para tu tensión arterial</small></span><i aria-hidden="true">›</i>
@@ -149,6 +172,56 @@
       </div>
     </dialog>
 
+    <!-- Alimentos que no quiero -->
+    <dialog id="dlg-excl" class="sheet" aria-labelledby="excl-title">
+      <div class="sheet-head">
+        <h2 id="excl-title">Alimentos que no quiero</h2>
+        <button type="button" class="icon-btn" data-close aria-label="Cerrar">✕</button>
+      </div>
+      <p class="hint">Los platos que los lleven no saldrán al generar ni en «Cambiar plato».</p>
+      <div id="excl-groups" class="chips"></div>
+      <label class="field search-field"><span class="sr-only">Buscar alimento</span><input id="excl-search" type="text" inputmode="search" autocomplete="off" placeholder="Buscar alimento"></label>
+      <div id="excl-list" class="switch-list"></div>
+    </dialog>
+
+    <!-- Ajustes del generador -->
+    <dialog id="dlg-gen" class="sheet" aria-labelledby="gen-title">
+      <div class="sheet-head">
+        <h2 id="gen-title">Ajustes del generador</h2>
+        <button type="button" class="icon-btn" data-close aria-label="Cerrar">✕</button>
+      </div>
+      <div id="gen-body"></div>
+    </dialog>
+
+    <!-- ¿Qué tengo en la nevera? -->
+    <dialog id="dlg-fridge" class="sheet" aria-labelledby="fridge-title">
+      <div class="sheet-head">
+        <h2 id="fridge-title">¿Qué tengo en la nevera?</h2>
+        <button type="button" class="icon-btn" data-close aria-label="Cerrar">✕</button>
+      </div>
+      <p class="hint">Marca lo que tienes y te ordeno las recetas por lo que usan y lo que te falta.</p>
+      <label class="field search-field"><span class="sr-only">Buscar ingrediente</span><input id="fridge-search" type="text" inputmode="search" autocomplete="off" placeholder="Buscar ingrediente"></label>
+      <div id="fridge-foods" class="chips"></div>
+      <div id="fridge-opts"></div>
+      <div id="fridge-results" class="fridge-results"></div>
+    </dialog>
+
+    <!-- Valorar un plato -->
+    <dialog id="dlg-rate" class="modal" aria-labelledby="rate-title">
+      <h2 id="rate-title">Valorar plato</h2>
+      <p id="rate-sub" class="hint"></p>
+      <div id="rate-body" class="rate-body"></div>
+      <button type="button" class="btn secondary spaced" data-close>Cerrar</button>
+    </dialog>
+
+    <!-- Poner una receta en un día -->
+    <dialog id="dlg-place" class="modal" aria-labelledby="place-title">
+      <h2 id="place-title">Poner en un día</h2>
+      <p id="place-sub" class="hint"></p>
+      <div id="place-body" class="rate-body"></div>
+      <button type="button" class="btn secondary spaced" data-close>Cancelar</button>
+    </dialog>
+
     <!-- Confirmación genérica -->
     <dialog id="dlg-confirm" class="modal" aria-labelledby="cf-title">
       <h2 id="cf-title"></h2>
@@ -161,6 +234,7 @@
   </div>
 
   <script src="data.js"></script>
+  <script src="planner.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

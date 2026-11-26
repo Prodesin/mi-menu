@@ -1,13 +1,14 @@
 /* Service worker de «Mi menú».
  * Estrategia: cache-first con lista explícita de ficheros. Para publicar una versión
  * nueva, cambia CACHE_VERSION: la caché antigua se borra al activarse. */
-const CACHE_VERSION = 'v3';
+const CACHE_VERSION = 'v4';
 const CACHE = `mi-menu-${CACHE_VERSION}`;
 const ASSETS = [
   './',
   './index.html',
   './styles.css',
   './data.js',
+  './planner.js',
   './app.js',
   './manifest.webmanifest',
   './icon-192.png',
