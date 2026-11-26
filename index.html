@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es-ES">
+<head>
+  <meta charset="utf-8">
+  <title>Mi menú</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Planificador semanal de comidas con macros y lista de la compra. Orientativo: no sustituye a tu médico.">
+  <meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+
+  <!-- iOS: instalación como app -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Mi menú">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <header class="app-header">
+      <h1 id="title">Mi menú</h1>
+      <p id="today-label" class="subtitle"></p>
+    </header>
+
+    <main id="main">
+      <!-- ================= HOY ================= -->
+      <section id="panel-hoy" class="panel" role="tabpanel" aria-labelledby="tab-hoy">
+        <div id="day-chips" class="day-chips" role="group" aria-label="Día de la semana"></div>
+        <div class="hoy-grid">
+          <div id="meals" class="meals" aria-label="Tomas del día"></div>
+          <article id="day-summary" class="card summary" aria-live="polite"></article>
+          <article id="today-recipe" class="card recipe-inline" aria-live="polite"></article>
+        </div>
+      </section>
+
+      <!-- ================= SEMANA ================= -->
+      <section id="panel-semana" class="panel" role="tabpanel" aria-labelledby="tab-semana" hidden>
+        <p id="week-avg" class="hint week-avg"></p>
+        <div id="week-grid" class="week-grid"></div>
+      </section>
+
+      <!-- ================= COMPRA ================= -->
+      <section id="panel-compra" class="panel" role="tabpanel" aria-labelledby="tab-compra" hidden>
+        <article class="card shop-head" id="shop-head"></article>
+        <div id="shop-list" class="shop-list"></div>
+        <details id="shop-home" class="card home-box"></details>
+      </section>
+
+      <!-- ================= RECETAS ================= -->
+      <section id="panel-recetas" class="panel" role="tabpanel" aria-labelledby="tab-recetas" hidden>
+        <div id="recipe-filter" class="segmented" role="group" aria-label="Filtrar recetas por toma"></div>
+        <div id="recipe-list" class="recipe-list"></div>
+      </section>
+
+      <!-- ================= MÁS ================= -->
+      <section id="panel-mas" class="panel" role="tabpanel" aria-labelledby="tab-mas" hidden>
+        <div class="more-grid">
+          <article class="card" id="goals-card"></article>
+          <article class="card">
+            <h2>Copia de seguridad</h2>
+            <p class="hint">Tus datos solo están en este dispositivo. Guarda una copia de vez en cuando.</p>
+            <div class="btn-row">
+              <button type="button" class="btn secondary" id="btn-export">Exportar copia</button>
+              <button type="button" class="btn secondary" id="btn-import">Importar copia</button>
+            </div>
+            <input type="file" id="file-import" accept=".json,application/json" hidden>
+            <button type="button" class="btn secondary spaced" id="btn-reset-plan">Restaurar todo el menú original</button>
+          </article>
+          <article class="card">
+            <h2>Enlaces</h2>
+            <a class="link-row" href="https://cursor.com/canvas/store-1bdb313c-dc79-41ab-b709-f51a885e7e99/2f680c43-b8f7-498e-b0cb-5f0f6968a911" target="_blank" rel="noopener">
+              <span><b>Entrenador personal</b><small>Tu página de seguimiento</small></span><i aria-hidden="true">›</i>
+            </a>
+            <a class="link-row" href="https://prodesin.github.io/mi-tension/" target="_blank" rel="noopener">
+              <span><b>Mi tensión</b><small>La app hermana para tu tensión arterial</small></span><i aria-hidden="true">›</i>
+            </a>
+          </article>
+          <article class="card notice">
+            <h2>Aviso</h2>
+            <p>Orientativo: no sustituye a tu médico ni a tu endocrino. Si usas insulina o sulfonilureas, consulta antes de cambiar hidratos.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <!-- Navegación: rail vertical a la derecha (nunca barra inferior) -->
+    <nav class="tabbar" role="tablist" aria-orientation="vertical" aria-label="Secciones">
+      <button type="button" role="tab" id="tab-hoy" data-tab="hoy" aria-selected="true" aria-controls="panel-hoy" aria-label="Hoy">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/></svg>
+        <span>Hoy</span>
+      </button>
+      <button type="button" role="tab" id="tab-semana" data-tab="semana" aria-selected="false" aria-controls="panel-semana" aria-label="Semana">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>
+        <span>Semana</span>
+      </button>
+      <button type="button" role="tab" id="tab-compra" data-tab="compra" aria-selected="false" aria-controls="panel-compra" aria-label="Compra">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2.5l2 11h10l2-8H7"/><circle cx="9.5" cy="19" r="1.3"/><circle cx="16.5" cy="19" r="1.3"/></svg>
+        <span>Compra</span>
+      </button>
+      <button type="button" role="tab" id="tab-recetas" data-tab="recetas" aria-selected="false" aria-controls="panel-recetas" aria-label="Recetas">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v16H6.5A1.5 1.5 0 0 0 5 20.5v-16z"/><path d="M5 20.5A1.5 1.5 0 0 0 6.5 22H19M9 8h6M9 12h6"/></svg>
+        <span>Recetas</span>
+      </button>
+      <button type="button" role="tab" id="tab-mas" data-tab="mas" aria-selected="false" aria-controls="panel-mas" aria-label="Más">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5.5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18.5" cy="12" r="1.4"/></svg>
+        <span>Más</span>
+      </button>
+    </nav>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <!-- Hoja para cambiar plato -->
+    <dialog id="dlg-swap" class="sheet" aria-labelledby="swap-title">
+      <div class="sheet-head">
+        <h2 id="swap-title">Cambiar plato</h2>
+        <button type="button" class="icon-btn" data-close aria-label="Cerrar">✕</button>
+      </div>
+      <p id="swap-sub" class="hint"></p>
+      <ul id="swap-list" class="swap-list"></ul>
+      <button type="button" class="btn secondary" id="swap-restore">Restaurar plato original</button>
+    </dialog>
+
+    <!-- Receta -->
+    <dialog id="dlg-recipe" class="sheet" aria-labelledby="rcp-title">
+      <div class="sheet-head">
+        <h2 id="rcp-title">Receta</h2>
+        <button type="button" class="icon-btn" data-close aria-label="Cerrar">✕</button>
+      </div>
+      <div id="rcp-body"></div>
+    </dialog>
+
+    <!-- Modo cocina -->
+    <dialog id="dlg-cook" class="cook" aria-labelledby="cook-title">
+      <div class="cook-top">
+        <span id="cook-title" class="cook-name"></span>
+        <button type="button" class="icon-btn" data-close aria-label="Salir del modo cocina">✕</button>
+      </div>
+      <div class="cook-step">
+        <p id="cook-count" class="cook-count"></p>
+        <p id="cook-text" class="cook-text"></p>
+      </div>
+      <div class="btn-row cook-nav">
+        <button type="button" class="btn secondary" id="cook-prev">Anterior</button>
+        <button type="button" class="btn primary" id="cook-next">Siguiente</button>
+      </div>
+    </dialog>
+
+    <!-- Confirmación genérica -->
+    <dialog id="dlg-confirm" class="modal" aria-labelledby="cf-title">
+      <h2 id="cf-title"></h2>
+      <p id="cf-text"></p>
+      <div class="btn-row">
+        <button type="button" class="btn secondary" id="cf-cancel">Cancelar</button>
+        <button type="button" class="btn primary" id="cf-ok">Aceptar</button>
+      </div>
+    </dialog>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
